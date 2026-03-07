@@ -1,0 +1,47 @@
+{
+  "name": "DataConsumer + TimescaleDB Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [
+    4222,
+    5432
+  ],
+  "portsAttributes": {
+    "4222": {
+      "label": "NATS"
+    },
+    "5432": {
+      "label": "TimescaleDB"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/init.sh",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "go.lintTool": "golangci-lint",
+        "go.useLanguageServer": true,
+        "go.formatTool": "gofumpt",
+        "go.toolsManagement.autoUpdate": false,
+        "go.alternateTools": {
+          "golangci-lint": "/usr/local/bin/golangci-lint",
+          "gofumpt": "/home/vscode/go/bin/gofumpt",
+          "gopls": "/home/vscode/go/bin/gopls",
+          "dlv": "/home/vscode/go/bin/dlv"
+        }
+      },
+      "extensions": [
+        "golang.go",
+        "ms-ossdata.vscode-postgresql",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "tamasfe.even-better-toml",
+        "eamodio.gitlens"
+      ]
+    }
+  }
+}
