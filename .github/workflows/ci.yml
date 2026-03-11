@@ -25,6 +25,22 @@ jobs:
         with:
           go-version: "1.26.0"
 
+      - name: Setup gofumpt
+        if: ${{ hashFiles('go.mod') != '' || hashFiles('backend/go.mod') != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          go install mvdan.cc/gofumpt@v0.9.2
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Setup golangci-lint
+        if: ${{ hashFiles('go.mod') != '' || hashFiles('backend/go.mod') != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
       - name: Go checks (root module)
         if: ${{ hashFiles('go.mod') != '' }}
         shell: bash
@@ -33,16 +49,16 @@ jobs:
           go mod download
 
           if find . -type f -name '*.go' -not -path './vendor/*' | grep -q .; then
-            UNFORMATTED="$(gofmt -l $(find . -type f -name '*.go' -not -path './vendor/*'))"
+            UNFORMATTED="$(gofumpt -l $(find . -type f -name '*.go' -not -path './vendor/*'))"
             if [ -n "${UNFORMATTED}" ]; then
-              echo "These Go files are not gofmt-formatted:"
+              echo "These Go files are not gofumpt-formatted:"
               echo "${UNFORMATTED}"
               exit 1
             fi
-            go vet ./...
+            golangci-lint run
             go test ./...
           else
-            echo "No Go files in root module; skipping gofmt/vet/test."
+            echo "No Go files in root module; skipping gofumpt/lint/test."
           fi
 
       - name: Go checks (backend module)
@@ -54,16 +70,16 @@ jobs:
           go mod download
 
           if find . -type f -name '*.go' -not -path './vendor/*' | grep -q .; then
-            UNFORMATTED="$(gofmt -l $(find . -type f -name '*.go' -not -path './vendor/*'))"
+            UNFORMATTED="$(gofumpt -l $(find . -type f -name '*.go' -not -path './vendor/*'))"
             if [ -n "${UNFORMATTED}" ]; then
-              echo "These backend Go files are not gofmt-formatted:"
+              echo "These backend Go files are not gofumpt-formatted:"
               echo "${UNFORMATTED}"
               exit 1
             fi
-            go vet ./...
+            golangci-lint run
             go test ./...
           else
-            echo "No Go files in backend module; skipping gofmt/vet/test."
+            echo "No Go files in backend module; skipping gofumpt/lint/test."
           fi
 
       - name: Setup Node
