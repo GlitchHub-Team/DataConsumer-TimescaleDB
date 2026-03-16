@@ -1,11 +1,15 @@
 {
-  "name": "DataConsumer + TimescaleDB Dev",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
-  },
+  "name": "DataConsumer, TimescaleDB Dev e NATS JetStream",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "data-consumer",
+  "runServices": [
+    "data-consumer",
+    "timescale",
+    "nats"
+  ],
+  "shutdownAction": "stopCompose",
   "remoteUser": "vscode",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "workspaceFolder": "/workspaces",
   "forwardPorts": [
     4222,
     5432
@@ -19,6 +23,7 @@
     }
   },
   "postCreateCommand": "bash .devcontainer/init.sh",
+  "postStartCommand": "bash .devcontainer/ensure-nats-stream.sh",
   "customizations": {
     "vscode": {
       "settings": {
@@ -36,11 +41,7 @@
       },
       "extensions": [
         "golang.go",
-        "ms-ossdata.vscode-postgresql",
-        "redhat.vscode-yaml",
-        "ms-azuretools.vscode-docker",
-        "tamasfe.even-better-toml",
-        "eamodio.gitlens"
+        "ms-ossdata.vscode-postgresql"
       ]
     }
   }

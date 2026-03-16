@@ -1,0 +1,50 @@
+services:
+  data-consumer:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    user: vscode
+    volumes:
+      - ..:/workspaces/${localWorkspaceFolderBasename}:cached
+    command: sleep infinity
+    environment:
+      POSTGRES_HOST: timescale
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      NATS_HOST: nats
+      NATS_PORT: ${NATS_PORT}
+      NATS_TOKEN: ${NATS_TOKEN}
+      NATS_SEED: ${NATS_SEED}
+    depends_on:
+      timescale:
+        condition: service_healthy
+      nats:
+        condition: service_started
+
+  timescale:
+    image: timescale/timescaledb:2.25.2-pg17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - timescale-data:/var/lib/postgresql/data
+      - ./timescale/schema/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dataconsumer"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  nats:
+    image: nats:2.12.5
+    command: ["-js"]
+    ports:
+      - "4222:4222"
+
+volumes:
+  timescale-data:

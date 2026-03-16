@@ -6,6 +6,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 )
 
 type TimescaleDBConnection *sql.DB
@@ -24,6 +25,21 @@ type (
 )
 
 const SensorDataTableName = "sensor_data"
+
+func NewTimescaleDBConnection(addr TimescaleAddress, port TimescalePort, user TimescaleUsername, pass TimescalePassword, dbname TimescaleDBName) (TimescaleDBConnection, error) {
+	dsn := fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		addr, port, user, pass, dbname,
+	)
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("impossibile aprire connessione Postgres: %w", err)
+	}
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("impossibile raggiungere Postgres: %w", err)
+	}
+	return db, nil
+}
 
 var MockTenantSchemas = []uuid.UUID{
 	mustParseUUID("11111111-1111-1111-1111-111111111111"),

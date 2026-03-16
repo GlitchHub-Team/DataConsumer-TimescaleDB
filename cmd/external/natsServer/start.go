@@ -22,6 +22,17 @@ const (
 type NatsSubject string
 
 func NewNATSConnection(address natsutil.NatsAddress, port natsutil.NatsPort, token natsutil.NatsToken, seed natsutil.NatsSeed) *nats.Conn {
+	opt := natsutil.JWTAuth(string(token), string(seed))
+
+	nc, err := nats.Connect("nats://"+string(address)+":"+strconv.Itoa(int(port)), opt)
+	if err != nil {
+		log.Fatalf("Error while connecting to NATS server: %v", err)
+	}
+
+	return nc
+}
+
+func NewNATSMockConnection(address natsutil.NatsAddress, port natsutil.NatsPort, token natsutil.NatsToken, seed natsutil.NatsSeed) *nats.Conn {
 	opts := &server.Options{
 		Host:      string(address),
 		Port:      int(port),

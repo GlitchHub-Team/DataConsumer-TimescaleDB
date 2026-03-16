@@ -1,3 +1,4 @@
 /cmd/natsStorage/*
 coverage.html
 coverage.out
+.devcontainer/.env

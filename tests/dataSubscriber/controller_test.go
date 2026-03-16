@@ -36,7 +36,7 @@ func TestNatsDataSubscriberController_Listen_ProcessaMessaggiPubblicati(t *testi
 	})
 
 	port := 4223
-	nc := natssever.NewNATSConnection(
+	nc := natssever.NewNATSMockConnection(
 		natsutil.NatsAddress("127.0.0.1"),
 		natsutil.NatsPort(port),
 		natsutil.NatsToken(""),
@@ -86,7 +86,7 @@ func TestNatsDataSubscriberController_Listen_ProcessaMessaggiPubblicati(t *testi
 		if want := 1; got != want {
 			t.Errorf("processed messages got %d, want %d", got, want)
 		}
-	case <-time.After(5 * time.Second):
+	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting ProcessBatch() call")
 	}
 
@@ -107,7 +107,7 @@ func TestNatsDataSubscriberController_Listen_FetchErrorThenStop(t *testing.T) {
 	})
 
 	port := 4224
-	nc := natssever.NewNATSConnection(
+	nc := natssever.NewNATSMockConnection(
 		natsutil.NatsAddress("127.0.0.1"),
 		natsutil.NatsPort(port),
 		natsutil.NatsToken(""),

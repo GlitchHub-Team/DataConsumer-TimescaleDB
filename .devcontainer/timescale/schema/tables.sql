@@ -1,0 +1,24 @@
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+
+CREATE SCHEMA IF NOT EXISTS "11111111-1111-1111-1111-111111111111";
+CREATE SCHEMA IF NOT EXISTS "22222222-2222-2222-2222-222222222222";
+
+CREATE TABLE IF NOT EXISTS "11111111-1111-1111-1111-111111111111".sensor_data (
+    sensor_id UUID NOT NULL,
+    gateway_id UUID NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
+    tenant_id UUID NOT NULL,
+    profile VARCHAR(255) NOT NULL,
+    data JSONB NOT NULL,
+    PRIMARY KEY (sensor_id, gateway_id, timestamp)
+);
+
+CREATE TABLE IF NOT EXISTS "22222222-2222-2222-2222-222222222222".sensor_data (
+    sensor_id UUID NOT NULL,
+    gateway_id UUID NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
+    tenant_id UUID NOT NULL,
+    profile VARCHAR(255) NOT NULL,
+    data JSONB NOT NULL,
+    PRIMARY KEY (sensor_id, gateway_id, timestamp)
+);
