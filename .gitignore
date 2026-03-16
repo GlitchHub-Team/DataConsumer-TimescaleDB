@@ -1,1 +1,3 @@
 /cmd/natsStorage/*
+coverage.html
+coverage.out

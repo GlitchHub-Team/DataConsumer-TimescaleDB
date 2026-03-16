@@ -26,5 +26,9 @@ type SensorData struct {
 }
 
 type StoreDataUseCase interface {
-	StoreData(data []*SensorData) error
+	StoreData(data []*SensorData, tenantId uuid.UUID) error
+}
+
+type WriteDataPort interface {
+	WriteData(data []*SensorData, tenantId uuid.UUID) error
 }

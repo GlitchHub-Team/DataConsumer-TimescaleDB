@@ -45,12 +45,12 @@ func NewNATSConnection(address natsutil.NatsAddress, port natsutil.NatsPort, tok
 		log.Fatalf("Error while connecting to NATS server: %v", err)
 	}
 
-	createStream(nc)
+	CreateStream(nc)
 
 	return nc
 }
 
-func createStream(nc *nats.Conn) {
+func CreateStream(nc *nats.Conn) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
