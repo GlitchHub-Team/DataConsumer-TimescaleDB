@@ -190,7 +190,9 @@ func waitStoredData(db *sql.DB, tenantID, sensorID, gatewayID uuid.UUID, ts time
 	for time.Now().Before(deadline) {
 		var profile string
 		var payload []byte
-		err := db.QueryRow(query, sensorID, gatewayID, ts).Scan(&profile, &payload)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		err := db.QueryRowContext(ctx, query, sensorID, gatewayID, ts).Scan(&profile, &payload)
+		cancel()
 		if err == nil {
 			return profile, payload, nil
 		}
@@ -223,14 +225,18 @@ func waitRowCount(db *sql.DB, tenantID, sensorID, gatewayID uuid.UUID, ts time.T
 
 func rowCount(db *sql.DB, query string, sensorID, gatewayID uuid.UUID, ts time.Time) (int, error) {
 	var count int
-	err := db.QueryRow(query, sensorID, gatewayID, ts).Scan(&count)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	err := db.QueryRowContext(ctx, query, sensorID, gatewayID, ts).Scan(&count)
 	return count, err
 }
 
 func cleanupInsertedRow(t *testing.T, db *sql.DB, tenantID, sensorID, gatewayID uuid.UUID, ts time.Time) {
 	t.Helper()
 	query := fmt.Sprintf(`DELETE FROM "%s".sensor_data WHERE sensor_id=$1 AND gateway_id=$2 AND timestamp=$3`, tenantID.String())
-	if _, err := db.Exec(query, sensorID, gatewayID, ts); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	if _, err := db.ExecContext(ctx, query, sensorID, gatewayID, ts); err != nil {
 		t.Fatalf("cleanup delete unexpected error: %v", err)
 	}
 }

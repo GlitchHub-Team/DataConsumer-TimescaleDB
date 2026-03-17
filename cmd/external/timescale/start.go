@@ -1,8 +1,10 @@
 package timescale
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
@@ -35,7 +37,9 @@ func NewTimescaleDBConnection(addr TimescaleAddress, port TimescalePort, user Ti
 	if err != nil {
 		return nil, fmt.Errorf("impossibile aprire connessione Postgres: %w", err)
 	}
-	if err := db.Ping(); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("impossibile raggiungere Postgres: %w", err)
 	}
 	return db, nil

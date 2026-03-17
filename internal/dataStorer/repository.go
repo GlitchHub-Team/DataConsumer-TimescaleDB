@@ -3,7 +3,7 @@ package datastorer
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"strconv"
 	"strings"
 
 	"DataConsumer/cmd/external/timescale"
@@ -42,7 +42,16 @@ func (r *TimescaleWriteDataRepository) WriteData(data []*SensorData, tenantId uu
 			b.WriteString(",")
 		}
 
-		b.WriteString(fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d)", base, base+1, base+2, base+3, base+4, base+5))
+		b.WriteByte('(')
+		for j := 0; j < argNum; j++ {
+			if j > 0 {
+				b.WriteByte(',')
+			}
+			b.WriteByte('$')
+			b.WriteString(strconv.Itoa(base + j))
+		}
+		b.WriteByte(')')
+
 		base += argNum
 
 		args = append(args,
