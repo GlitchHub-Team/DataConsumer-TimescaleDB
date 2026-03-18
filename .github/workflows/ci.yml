@@ -29,6 +29,9 @@ jobs:
       DATA_CONSUMER_CA_PEM_PATH: ca.pem
 
     steps:
+      - name: Fix permissions for cleanup
+        run: |
+          sudo chown -R $(whoami):$(whoami) .
       - name: Checkout
         uses: actions/checkout@v4
 
