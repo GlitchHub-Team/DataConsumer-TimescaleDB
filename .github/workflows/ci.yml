@@ -50,13 +50,9 @@ jobs:
 
           mkdir -p cmd
 
-          cat > cmd/data_consumer.creds <<'EOF'
-          ${{ secrets.DATA_CONSUMER_CREDS }}
-          EOF
+          printf '%s\n' "${{ secrets.DATA_CONSUMER_CREDS }}" > cmd/data_consumer.creds
 
-          cat > cmd/admin_test.creds <<'EOF'
-          ${{ secrets.DATA_CONSUMER_TEST_CREDS }}
-          EOF
+          printf '%s\n' "${{ secrets.DATA_CONSUMER_TEST_CREDS }}" > cmd/admin_test.creds
 
           chmod 600 cmd/data_consumer.creds cmd/admin_test.creds
 
@@ -67,9 +63,7 @@ jobs:
             fi
 
             mkdir -p .devcontainer/nats/certs
-            cat > .devcontainer/nats/certs/server.key <<'EOF'
-            ${{ secrets.NATS_SERVER_TLS_KEY }}
-            EOF
+            printf '%s\n' "${{ secrets.NATS_SERVER_TLS_KEY }}" > .devcontainer/nats/certs/server.key
             chmod 600 .devcontainer/nats/certs/server.key
           fi
 
