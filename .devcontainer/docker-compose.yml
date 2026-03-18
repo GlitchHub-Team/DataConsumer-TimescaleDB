@@ -25,7 +25,7 @@ services:
         condition: service_started
 
   timescale:
-    image: timescale/timescaledb:2.25.2-pg17
+    image: timescale/timescaledb:2.25.2-pg18
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
