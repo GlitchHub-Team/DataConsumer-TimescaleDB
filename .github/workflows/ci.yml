@@ -97,8 +97,12 @@ jobs:
             COMPOSE_CMD="docker compose"
           elif command -v docker-compose >/dev/null 2>&1; then
             COMPOSE_CMD="docker-compose"
+          elif sudo -n docker compose version >/dev/null 2>&1; then
+            COMPOSE_CMD="sudo -n docker compose"
+          elif sudo -n docker-compose version >/dev/null 2>&1; then
+            COMPOSE_CMD="sudo -n docker-compose"
           else
-            echo "::error::Neither 'docker compose' nor 'docker-compose' is available on the runner"
+            echo "::error::Docker is unavailable for the runner user. Configure docker group permissions or passwordless sudo for docker/docker-compose."
             exit 1
           fi
 
@@ -130,7 +134,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          go mod download
           gofumpt -w .
           golangci-lint run
           go test ./...
@@ -146,4 +149,8 @@ jobs:
             docker compose -f .github/docker-compose.ci.yml down -v
           elif command -v docker-compose >/dev/null 2>&1; then
             docker-compose -f .github/docker-compose.ci.yml down -v
+          elif sudo -n docker compose version >/dev/null 2>&1; then
+            sudo -n docker compose -f .github/docker-compose.ci.yml down -v
+          elif sudo -n docker-compose version >/dev/null 2>&1; then
+            sudo -n docker-compose -f .github/docker-compose.ci.yml down -v
           fi
