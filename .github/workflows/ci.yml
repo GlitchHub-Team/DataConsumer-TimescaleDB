@@ -15,6 +15,7 @@ jobs:
     env:
       DATA_CONSUMER_CREDS_PATH: data_consumer.creds
       DATA_CONSUMER_TEST_CREDS_PATH: admin_test.creds
+      DATA_CONSUMER_CA_PEM_PATH: ca.pem
 
     steps:
       - name: Checkout
