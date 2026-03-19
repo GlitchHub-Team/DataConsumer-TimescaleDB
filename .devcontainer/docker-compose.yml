@@ -11,15 +11,7 @@ services:
       - ../.env
     environment:
       POSTGRES_HOST: timescale
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       NATS_HOST: nats
-      NATS_PORT: ${NATS_PORT}
-      DATA_CONSUMER_CREDS_PATH: ${DATA_CONSUMER_CREDS_PATH}
-      DATA_CONSUMER_TEST_CREDS_PATH: ${DATA_CONSUMER_TEST_CREDS_PATH}
-      DATA_CONSUMER_CA_PEM_PATH: ${DATA_CONSUMER_CA_PEM_PATH}
     depends_on:
       timescale:
         condition: service_healthy
