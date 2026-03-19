@@ -37,7 +37,6 @@ services:
       - ./.devcontainer/nats/nats.conf:/etc/nats/nats.conf:ro
       - ./.devcontainer/nats/certs:/etc/nats/certs:ro
       - ./.devcontainer/nats/jwt-accounts:/etc/nats/jwt-accounts:ro
-      - nats-js-data:/data/nats-jetstream
 
   nats-manager:
     image: natsio/nats-box:0.19.3

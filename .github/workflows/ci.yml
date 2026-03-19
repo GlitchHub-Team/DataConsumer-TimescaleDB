@@ -132,4 +132,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker compose down -v
+          docker compose down -v -t 0 || {
+            echo "Stop standard fallito, provo il kill forzato..."
+            docker ps -q | xargs -r docker rm -f
+          }
