@@ -8,7 +8,7 @@ services:
       - ..:/workspaces/${localWorkspaceFolderBasename}:cached
     command: sleep infinity
     env_file:
-      - ../.env
+      - ../infrastructure/.env
     environment:
       POSTGRES_HOST: timescale
       NATS_HOST: nats
@@ -19,4 +19,4 @@ services:
         condition: service_started
 
 include:
-  - path: ../docker-compose.yml
+  - path: ../infrastructure/docker-compose.yml

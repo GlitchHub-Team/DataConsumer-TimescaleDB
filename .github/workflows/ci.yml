@@ -71,28 +71,28 @@ jobs:
 
           printf '%s\n' "${{ secrets.DATA_CONSUMER_TEST_CREDS }}" > cmd/admin_test.creds
 
-          mkdir -p services/natsManager
-          printf '%s\n' "${{ secrets.NATS_STREAM_SETUPPER_CREDS }}" > services/natsManager/stream_setupper.creds
+          mkdir -p infrastructure/natsManager
+          printf '%s\n' "${{ secrets.NATS_STREAM_SETUPPER_CREDS }}" > infrastructure/natsManager/stream_setupper.creds
 
           chmod 600 cmd/data_consumer.creds cmd/admin_test.creds
-          chmod 600 services/natsManager/stream_setupper.creds
+          chmod 600 infrastructure/natsManager/stream_setupper.creds
 
-          if [ ! -f services/nats/certs/server.key ]; then
+          if [ ! -f infrastructure/nats/certs/server.key ]; then
             if [ -z "${{ secrets.NATS_SERVER_TLS_KEY }}" ]; then
-              echo "::error::Missing secret NATS_SERVER_TLS_KEY (required when services/nats/certs/server.key is not committed)"
+              echo "::error::Missing secret NATS_SERVER_TLS_KEY (required when infrastructure/nats/certs/server.key is not committed)"
               exit 1
             fi
 
-            mkdir -p services/nats/certs
-            printf '%s\n' "${{ secrets.NATS_SERVER_TLS_KEY }}" > services/nats/certs/server.key
-            chmod 600 services/nats/certs/server.key
+            mkdir -p infrastructure/nats/certs
+            printf '%s\n' "${{ secrets.NATS_SERVER_TLS_KEY }}" > infrastructure/nats/certs/server.key
+            chmod 600 infrastructure/nats/certs/server.key
           fi
 
       - name: Start integration dependencies
         shell: bash
         run: |
           set -euo pipefail
-          docker compose up -d
+          docker compose -f infrastructure/docker-compose.yml down -v
 
           echo "Recupero ID del container nats-manager..."
           MANAGER_ID=$(docker compose ps -q nats-manager)
