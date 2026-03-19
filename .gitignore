@@ -2,6 +2,6 @@
 .devcontainer/nats/jetstream-data
 coverage.html
 coverage.out
-.devcontainer/.env
+*.env
 *.creds
 *.key

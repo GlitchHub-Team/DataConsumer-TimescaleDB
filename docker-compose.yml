@@ -9,7 +9,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - timescale-ci-data:/var/lib/postgresql/data
-      - ./.devcontainer/timescale/schema/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
+      - ./services/timescale/schema/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -34,9 +34,9 @@ services:
       NATS_SYS_ACCOUNT_ID: ${NATS_SYS_ACCOUNT_ID}
       NATS_SENSOR_DATA_CORE_ID: ${NATS_SENSOR_DATA_CORE_ID}
     volumes:
-      - ./.devcontainer/nats/nats.conf:/etc/nats/nats.conf:ro
-      - ./.devcontainer/nats/certs:/etc/nats/certs:ro
-      - ./.devcontainer/nats/jwt-accounts:/etc/nats/jwt-accounts:ro
+      - ./services/nats/nats.conf:/etc/nats/nats.conf:ro
+      - ./services/nats/certs:/etc/nats/certs:ro
+      - ./services/nats/jwt-accounts:/etc/nats/jwt-accounts:ro
 
   nats-manager:
     image: natsio/nats-box:0.19.3
@@ -44,9 +44,9 @@ services:
       nats:
         condition: service_healthy
     volumes:
-      - ./.devcontainer/natsManager/setup-nats.sh:/setup-nats.sh:ro
-      - ./.devcontainer/natsManager/ca.pem:/ca.pem:ro
-      - ./.devcontainer/natsManager/stream_setupper.creds:/stream_setupper.creds:ro
+      - ./services/natsManager/setup-nats.sh:/setup-nats.sh:ro
+      - ./services/natsManager/ca.pem:/ca.pem:ro
+      - ./services/natsManager/stream_setupper.creds:/stream_setupper.creds:ro
     entrypoint: ["sh", "/setup-nats.sh"]
     environment:
       NATS_URL: nats://nats:${NATS_PORT}
