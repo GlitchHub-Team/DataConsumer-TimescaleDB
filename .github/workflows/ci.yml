@@ -45,6 +45,12 @@ jobs:
           go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
+      - name: Start Infrastructure
+        uses: GlitchHub-Team/Infrastructure/.github/actions/start@main
+        with:
+          NATS_STREAM_SETUPPER_CREDS: ${{ secrets.NATS_STREAM_SETUPPER_CREDS }}
+          NATS_SERVER_TLS_KEY: ${{ secrets.NATS_SERVER_TLS_KEY }}
+
       - name: Init integration credentials
         shell: bash
         run: |
@@ -60,62 +66,12 @@ jobs:
             exit 1
           fi
 
-          if [ -z "${{ secrets.NATS_STREAM_SETUPPER_CREDS }}" ]; then
-            echo "::error::Missing secret NATS_STREAM_SETUPPER_CREDS"
-            exit 1
-          fi
-
           mkdir -p cmd
 
           printf '%s\n' "${{ secrets.DATA_CONSUMER_CREDS }}" > cmd/data_consumer.creds
-
           printf '%s\n' "${{ secrets.DATA_CONSUMER_TEST_CREDS }}" > cmd/admin_test.creds
 
-          mkdir -p infrastructure/natsManager
-          printf '%s\n' "${{ secrets.NATS_STREAM_SETUPPER_CREDS }}" > infrastructure/natsManager/stream_setupper.creds
-
           chmod 600 cmd/data_consumer.creds cmd/admin_test.creds
-          chmod 600 infrastructure/natsManager/stream_setupper.creds
-
-          if [ ! -f infrastructure/nats/certs/server.key ]; then
-            if [ -z "${{ secrets.NATS_SERVER_TLS_KEY }}" ]; then
-              echo "::error::Missing secret NATS_SERVER_TLS_KEY (required when infrastructure/nats/certs/server.key is not committed)"
-              exit 1
-            fi
-
-            mkdir -p infrastructure/nats/certs
-            printf '%s\n' "${{ secrets.NATS_SERVER_TLS_KEY }}" > infrastructure/nats/certs/server.key
-            chmod 600 infrastructure/nats/certs/server.key
-          fi
-
-      - name: Start integration dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          docker compose -f infrastructure/docker-compose.yml down -v
-
-          echo "Recupero ID del container nats-manager..."
-          MANAGER_ID=$(docker compose ps -q nats-manager)
-
-          if [ -z "$MANAGER_ID" ]; then
-            echo "ERRORE: Impossibile trovare l'ID del container nats-manager"
-            docker compose ps
-            exit 1
-          fi
-
-          echo "Attendendo il completamento del setup di NATS (ID: $MANAGER_ID)..."
-
-          docker wait "$MANAGER_ID"
-
-          EXIT_CODE=$(docker inspect "$MANAGER_ID" --format='{{.State.ExitCode}}')
-
-          if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "ERRORE: Il setup di NATS (nats-manager) è fallito con codice $EXIT_CODE"
-            docker compose logs nats-manager
-            exit 1
-          fi
-
-          echo "Setup NATS completato con successo (Exit Code 0). Avvio dei test..."
 
       - name: Go checks (root module)
         shell: bash
@@ -127,12 +83,6 @@ jobs:
           cd cmd
           go build .
 
-      - name: Stop integration dependencies
-        if: ${{ always() }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          docker compose down -v -t 0 || {
-            echo "Stop standard fallito, provo il kill forzato..."
-            docker ps -q | xargs -r docker rm -f
-          }
+      - name: Stop
+        if: always()
+        uses: GlitchHub-Team/Infrastructure/.github/actions/stop@main
