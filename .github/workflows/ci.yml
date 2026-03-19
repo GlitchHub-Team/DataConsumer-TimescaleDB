@@ -93,6 +93,18 @@ jobs:
         run: |
           set -euo pipefail
           docker compose up -d
+          echo "Attendendo il completamento del setup di NATS (nats-manager)..."
+
+          docker wait $(docker compose ps -q nats-manager)
+
+          EXIT_CODE=$(docker inspect $(docker compose ps -q nats-manager) --format='{{.State.ExitCode}}')
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "ERRORE: Il setup di NATS è fallito!"
+            docker compose logs nats-manager
+            exit 1
+          fi
+
+          echo "NATS Setup completato. Avvio dei test..."
 
       - name: Go checks (root module)
         shell: bash
