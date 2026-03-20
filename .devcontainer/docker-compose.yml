@@ -4,6 +4,8 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     user: vscode
+    env_file:
+      - ../Infrastructure/.env
     volumes:
       - ..:/workspaces/${localWorkspaceFolderBasename}:cached
     command: sleep infinity
