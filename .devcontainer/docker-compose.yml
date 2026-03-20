@@ -7,11 +7,10 @@ services:
     volumes:
       - ..:/workspaces/${localWorkspaceFolderBasename}:cached
     command: sleep infinity
-    env_file:
-      - ../Infrastructure/.env
     environment:
-      POSTGRES_HOST: timescale
-      NATS_HOST: nats
+      DATA_CONSUMER_CREDS_PATH: data_consumer.creds
+      DATA_CONSUMER_TEST_CREDS_PATH: admin_test.creds
+      DATA_CONSUMER_CA_PEM_PATH: ca.pem
     depends_on:
       timescale:
         condition: service_healthy
