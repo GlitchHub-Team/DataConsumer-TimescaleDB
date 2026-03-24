@@ -30,9 +30,8 @@ jobs:
       CLOUD_POSTGRES_USER: ${{ secrets.CLOUD_POSTGRES_USER }}
       CLOUD_POSTGRES_PASSWORD: ${{ secrets.CLOUD_POSTGRES_PASSWORD }}
       DATA_CONSUMER_CREDS_PATH: data_consumer.creds
-      TEST_CREDS_PATH: admin_test.creds
-      CA_PEM_PATH: ca.pem
-
+      DATA_CONSUMER_TEST_CREDS_PATH: admin_test.creds
+      DATA_CONSUMER_CA_PEM_PATH: ca.pem
     steps:
       - name: Checkout
         uses: actions/checkout@v4
