@@ -24,9 +24,14 @@ jobs:
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      DATA_CONSUMER_CREDS_PATH: data_consumer.creds
-      DATA_CONSUMER_TEST_CREDS_PATH: admin_test.creds
-      DATA_CONSUMER_CA_PEM_PATH: ca.pem
+      CLOUD_POSTGRES_HOST: ${{ vars.CLOUD_POSTGRES_HOST }}
+      CLOUD_POSTGRES_PORT: ${{ vars.CLOUD_POSTGRES_PORT }}
+      CLOUD_POSTGRES_DB: ${{ vars.CLOUD_POSTGRES_DB }}
+      CLOUD_POSTGRES_USER: ${{ secrets.CLOUD_POSTGRES_USER }}
+      CLOUD_POSTGRES_PASSWORD: ${{ secrets.CLOUD_POSTGRES_PASSWORD }}
+      GATEWAY_BASE_CREDS_PATH: base.creds
+      TEST_CREDS_PATH: admin_test.creds
+      CA_PEM_PATH: ca.pem
 
     steps:
       - name: Checkout
