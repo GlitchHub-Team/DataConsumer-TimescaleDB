@@ -1,0 +1,20 @@
+name: Trigger MVP CI
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: self-hosted
+    steps:
+      - name: Dispatch MVP integration CI
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.MVP_CI_TRIGGER_TOKEN }}
+          repository: GlitchHub-Team/MVP
+          event-type: dataconsumer-main-push
