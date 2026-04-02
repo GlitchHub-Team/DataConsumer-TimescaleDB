@@ -6,3 +6,4 @@ coverage.out
 *.creds
 *.key
 Infrastructure
+/cmd/dataconsumer
