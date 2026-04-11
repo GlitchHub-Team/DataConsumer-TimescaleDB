@@ -23,7 +23,7 @@ func TestStoreData_AckReceived_OnSuccessfulSave(t *testing.T) {
 	h := setupRealPipeline(t, subject)
 	defer cleanupInsertedRow(t, h.db, tenantID, sensorID, gatewayID, ts)
 
-	body := mustBuildValidBody(t, sensorID, gatewayID, tenantID, string(datastorer.HeartRate), ts, []byte(`{"heartRate":95}`))
+	body := mustBuildValidBody(t, sensorID, gatewayID, tenantID, string(datastorer.HeartRate), ts, []byte(`{"heart_rate":95}`))
 	publishAndFlush(t, h.jsTest, subject, body)
 
 	if err := waitRowCount(h.db, tenantID, sensorID, gatewayID, ts, 1, 10*time.Second); err != nil {

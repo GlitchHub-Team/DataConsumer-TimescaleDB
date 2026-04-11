@@ -19,7 +19,7 @@ func TestStoreValidData_RealServices(t *testing.T) {
 	sensorID := uuid.New()
 	gatewayID := uuid.New()
 	ts := time.Now().UTC().Truncate(time.Microsecond)
-	payload := json.RawMessage(`{"heartRate":72,"status":"ok"}`)
+	payload := json.RawMessage(`{"heart_rate":72,"status":"ok"}`)
 	subject := buildSubject(tenantID, gatewayID, sensorID)
 
 	h := setupRealPipeline(t, subject)

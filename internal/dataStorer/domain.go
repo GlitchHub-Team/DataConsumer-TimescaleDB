@@ -9,11 +9,11 @@ import (
 type SensorProfile string
 
 const (
-	Ecg                  SensorProfile = "ECG"
-	EnvironmentalSensing SensorProfile = "EnvironmentalSensing"
-	HealthThermometer    SensorProfile = "HealthThermometer"
-	HeartRate            SensorProfile = "HeartRate"
-	PulseOximeter        SensorProfile = "PulseOximeter"
+	Ecg                  SensorProfile = "ecg_custom"
+	EnvironmentalSensing SensorProfile = "environmental_sensing"
+	HealthThermometer    SensorProfile = "health_thermometer"
+	HeartRate            SensorProfile = "heart_rate"
+	PulseOximeter        SensorProfile = "pulse_oximeter"
 )
 
 type SensorData struct {

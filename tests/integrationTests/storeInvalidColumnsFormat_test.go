@@ -9,23 +9,23 @@ import (
 )
 
 func TestStoreData_InvalidSensorIDFormat_NotSaved(t *testing.T) {
-	runInvalidColumnFormatTest(t, `{"sensorId":"not-a-uuid","gatewayId":"%s","tenantId":"%s","profile":"HeartRate","timestamp":"%s","data":{"heartRate":80}}`)
+	runInvalidColumnFormatTest(t, `{"sensorId":"not-a-uuid","gatewayId":"%s","tenantId":"%s","profile":"heart_rate","timestamp":"%s","data":{"heart_rate":80}}`)
 }
 
 func TestStoreData_InvalidTenantIDFormat_NotSaved(t *testing.T) {
-	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"%s","tenantId":"not-a-uuid","profile":"HeartRate","timestamp":"%s","data":{"heartRate":80}}`)
+	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"%s","tenantId":"not-a-uuid","profile":"heart_rate","timestamp":"%s","data":{"heart_rate":80}}`)
 }
 
 func TestStoreData_InvalidGatewayIDFormat_NotSaved(t *testing.T) {
-	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"not-a-uuid","tenantId":"%s","profile":"HeartRate","timestamp":"%s","data":{"heartRate":80}}`)
+	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"not-a-uuid","tenantId":"%s","profile":"heart_rate","timestamp":"%s","data":{"heart_rate":80}}`)
 }
 
 func TestStoreData_InvalidTimestampFormat_NotSaved(t *testing.T) {
-	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"%s","tenantId":"%s","profile":"HeartRate","timestamp":"not-a-time","data":{"heartRate":80}}`)
+	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"%s","tenantId":"%s","profile":"heart_rate","timestamp":"not-a-time","data":{"heart_rate":80}}`)
 }
 
 func TestStoreData_InvalidProfileFormat_NotSaved(t *testing.T) {
-	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"%s","tenantId":"%s","profile":123,"timestamp":"%s","data":{"heartRate":80}}`)
+	runInvalidColumnFormatTest(t, `{"sensorId":"%s","gatewayId":"%s","tenantId":"%s","profile":123,"timestamp":"%s","data":{"heart_rate":80}}`)
 }
 
 func runInvalidColumnFormatTest(t *testing.T, rawJSONPattern string) {

@@ -22,7 +22,7 @@ func TestStoreData_InvalidDataFormat_NotSaved(t *testing.T) {
 	h := setupRealPipeline(t, subject)
 	defer cleanupInsertedRow(t, h.db, tenantID, sensorID, gatewayID, ts)
 
-	body := []byte(fmt.Sprintf(`{"sensorId":"%s","gatewayId":"%s","tenantId":"%s","profile":"HeartRate","timestamp":"%s","data":{"heartRate":}`, sensorID, gatewayID, tenantID, ts))
+	body := []byte(fmt.Sprintf(`{"sensorId":"%s","gatewayId":"%s","tenantId":"%s","profile":"heart_rate","timestamp":"%s","data":{"heart_rate":}`, sensorID, gatewayID, tenantID, ts))
 	publishAndFlush(t, h.jsTest, subject, body)
 
 	if err := waitRowCount(h.db, tenantID, sensorID, gatewayID, ts, 0, 5*time.Second); err != nil {

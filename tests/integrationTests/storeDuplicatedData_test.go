@@ -23,7 +23,7 @@ func TestStoreData_DuplicatedPublish_NotAllowed(t *testing.T) {
 	h := setupRealPipeline(t, subject)
 	defer cleanupInsertedRow(t, h.db, tenantID, sensorID, gatewayID, ts)
 
-	body := mustBuildValidBody(t, sensorID, gatewayID, tenantID, string(datastorer.HeartRate), ts, []byte(`{"heartRate":66}`))
+	body := mustBuildValidBody(t, sensorID, gatewayID, tenantID, string(datastorer.HeartRate), ts, []byte(`{"heart_rate":66}`))
 	publishAndFlush(t, h.jsTest, subject, body)
 	publishAndFlush(t, h.jsTest, subject, body)
 

@@ -89,7 +89,7 @@ func TestNatsBatchProcessor_ProcessBatch_StoreAndAckOnValidPayload(t *testing.T)
 		SensorId:  sensorID,
 		GatewayId: gatewayID,
 		TenantId:  tenantID,
-		Profile:   "HeartRate",
+		Profile:   "heart_rate",
 		Timestamp: ts,
 		Data:      rawData,
 	}
@@ -124,7 +124,7 @@ func TestNatsBatchProcessor_ProcessBatch_StoreAndAckOnValidPayload(t *testing.T)
 	if got, want := stored.TenantId, tenantID; got != want {
 		t.Errorf("TenantId got %s, want %s", got, want)
 	}
-	if got, want := stored.Profile, datastorer.SensorProfile("HeartRate"); got != want {
+	if got, want := stored.Profile, datastorer.SensorProfile("heart_rate"); got != want {
 		t.Errorf("Profile got %s, want %s", got, want)
 	}
 	if got, want := stored.Timestamp, ts; !got.Equal(want) {
@@ -190,7 +190,7 @@ func TestNatsBatchProcessor_ProcessBatch_NoAckWhenStoreFails(t *testing.T) {
 		SensorId:  uuid.New(),
 		GatewayId: uuid.New(),
 		TenantId:  uuid.New(),
-		Profile:   "ECG",
+		Profile:   "ecg_custom",
 		Timestamp: time.Now(),
 		Data:      []byte(`{"v":1}`),
 	}
