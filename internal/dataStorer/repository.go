@@ -64,6 +64,8 @@ func (r *TimescaleWriteDataRepository) WriteData(data []*SensorData, tenantId uu
 		)
 	}
 
+	b.WriteString(` ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`)
+
 	_, err := r.dbConnection.ExecContext(r.ctx, b.String(), args...)
 	return err
 }

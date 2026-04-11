@@ -31,7 +31,7 @@ func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnMissingSchema(t *t
 	tenantID := uuid.New()
 	data := singleDataForTenant(tenantID)
 
-	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6)`
+	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 	mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 		WithArgs(data[0].SensorId, data[0].GatewayId, data[0].TenantId, data[0].Profile, data[0].Timestamp, data[0].Data).
 		WillReturnError(errors.New(`pq: schema "` + tenantID.String() + `" does not exist`))
@@ -52,7 +52,7 @@ func TestTimescaleWriteDataRepository_WriteData_SucceedsOnDefinedMockSchemas(t *
 
 	for _, tenantID := range schemas {
 		data := singleDataForTenant(tenantID)
-		query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6)`
+		query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 
 		mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 			WithArgs(data[0].SensorId, data[0].GatewayId, data[0].TenantId, data[0].Profile, data[0].Timestamp, data[0].Data).
@@ -83,7 +83,7 @@ func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnInvalidJSONBytes(t
 		},
 	}
 
-	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6)`
+	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 	mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 		WithArgs(
 			invalidJSONData[0].SensorId,
@@ -105,7 +105,7 @@ func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnInvalidJSONBytes(t
 	}
 }
 
-func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnDuplicatePrimaryKey(t *testing.T) {
+func TestTimescaleWriteDataRepository_WriteData_IgnoresDuplicatePrimaryKey(t *testing.T) {
 	repo, mockPg := newRepositoryWithMock(t)
 	tenantID := timescale.MockTenantSchemas[0]
 
@@ -120,7 +120,7 @@ func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnDuplicatePrimaryKe
 		},
 	}
 
-	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6)`
+	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 	mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 		WithArgs(
 			duplicateRecord[0].SensorId,
@@ -130,11 +130,11 @@ func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnDuplicatePrimaryKe
 			duplicateRecord[0].Timestamp,
 			duplicateRecord[0].Data,
 		).
-		WillReturnError(errors.New(`pq: duplicate key value violates unique constraint "sensor_data_pkey"`))
+		WillReturnResult(sqlmock.NewResult(0, 0))
 
 	err := repo.WriteData(duplicateRecord, tenantID)
-	if err == nil {
-		t.Fatal("WriteData() expected duplicate key error, got nil")
+	if err != nil {
+		t.Fatalf("WriteData() unexpected error on duplicate key with ON CONFLICT: %v", err)
 	}
 
 	if err := mockPg.Mock.ExpectationsWereMet(); err != nil {
