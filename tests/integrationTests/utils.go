@@ -185,7 +185,7 @@ func publishAndFlush(t *testing.T, js jetstream.JetStream, subject string, body 
 
 func waitStoredData(db *sql.DB, tenantID, sensorID, gatewayID uuid.UUID, ts time.Time, timeout time.Duration) (string, []byte, error) {
 	deadline := time.Now().Add(timeout)
-	query := fmt.Sprintf(`SELECT profile, data FROM "%s".sensor_data WHERE sensor_id=$1 AND gateway_id=$2 AND timestamp=$3`, tenantID.String())
+	query := fmt.Sprintf(`SELECT profile, data FROM "%s".sensor_data WHERE sensor_id=$1 AND gateway_id=$2 AND timestamp=$3`, tenantSchemaName(tenantID))
 
 	for time.Now().Before(deadline) {
 		var profile string
@@ -207,7 +207,7 @@ func waitStoredData(db *sql.DB, tenantID, sensorID, gatewayID uuid.UUID, ts time
 
 func waitRowCount(db *sql.DB, tenantID, sensorID, gatewayID uuid.UUID, ts time.Time, expected int, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
-	query := fmt.Sprintf(`SELECT count(*) FROM "%s".sensor_data WHERE sensor_id=$1 AND gateway_id=$2 AND timestamp=$3`, tenantID.String())
+	query := fmt.Sprintf(`SELECT count(*) FROM "%s".sensor_data WHERE sensor_id=$1 AND gateway_id=$2 AND timestamp=$3`, tenantSchemaName(tenantID))
 
 	for time.Now().Before(deadline) {
 		count, err := rowCount(db, query, sensorID, gatewayID, ts)
@@ -233,12 +233,16 @@ func rowCount(db *sql.DB, query string, sensorID, gatewayID uuid.UUID, ts time.T
 
 func cleanupInsertedRow(t *testing.T, db *sql.DB, tenantID, sensorID, gatewayID uuid.UUID, ts time.Time) {
 	t.Helper()
-	query := fmt.Sprintf(`DELETE FROM "%s".sensor_data WHERE sensor_id=$1 AND gateway_id=$2 AND timestamp=$3`, tenantID.String())
+	query := fmt.Sprintf(`DELETE FROM "%s".sensor_data WHERE sensor_id=$1 AND gateway_id=$2 AND timestamp=$3`, tenantSchemaName(tenantID))
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	if _, err := db.ExecContext(ctx, query, sensorID, gatewayID, ts); err != nil {
 		t.Fatalf("cleanup delete unexpected error: %v", err)
 	}
+}
+
+func tenantSchemaName(tenantID uuid.UUID) string {
+	return "tenant_" + tenantID.String()
 }
 
 func waitConsumerAckPending(consumer jetstream.Consumer, expected int, timeout time.Duration) error {

@@ -67,7 +67,7 @@ func NewTimescaleMockDBConnection(mock *MockPostgres) TimescaleDBConnection {
 }
 
 func BuildTenantSchemaDDL(tenantID uuid.UUID) []string {
-	schemaName := tenantID.String()
+	schemaName := tenantSchemaName(tenantID)
 
 	return []string{
 		fmt.Sprintf(`CREATE SCHEMA IF NOT EXISTS "%s"`, schemaName),
@@ -81,6 +81,10 @@ func BuildTenantSchemaDDL(tenantID uuid.UUID) []string {
 						PRIMARY KEY (sensor_id, gateway_id, timestamp)
 					)`, schemaName, SensorDataTableName),
 	}
+}
+
+func tenantSchemaName(tenantID uuid.UUID) string {
+	return "tenant_" + tenantID.String()
 }
 
 func BuildMockTenantSchemaDDL() []string {

@@ -23,6 +23,10 @@ func NewTimescaleWriteDataRepository(dbConnection timescale.TimescaleDBConnectio
 	}
 }
 
+func getSchemaName(tenantId uuid.UUID) string {
+	return "tenant_" + tenantId.String()
+}
+
 func (r *TimescaleWriteDataRepository) WriteData(data []*SensorData, tenantId uuid.UUID) error {
 	if len(data) == 0 {
 		return nil
@@ -30,7 +34,7 @@ func (r *TimescaleWriteDataRepository) WriteData(data []*SensorData, tenantId uu
 
 	var b strings.Builder
 	b.WriteString(`INSERT INTO "`)
-	b.WriteString(tenantId.String())
+	b.WriteString(getSchemaName(tenantId))
 	b.WriteString(`".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES `)
 
 	argNum := 6

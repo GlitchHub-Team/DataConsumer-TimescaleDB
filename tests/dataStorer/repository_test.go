@@ -31,10 +31,10 @@ func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnMissingSchema(t *t
 	tenantID := uuid.New()
 	data := singleDataForTenant(tenantID)
 
-	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
+	query := `INSERT INTO "` + tenantSchemaName(tenantID) + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 	mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 		WithArgs(data[0].SensorId, data[0].GatewayId, data[0].TenantId, data[0].Profile, data[0].Timestamp, data[0].Data).
-		WillReturnError(errors.New(`pq: schema "` + tenantID.String() + `" does not exist`))
+		WillReturnError(errors.New(`pq: schema "` + tenantSchemaName(tenantID) + `" does not exist`))
 
 	err := repo.WriteData(data, tenantID)
 	if err == nil {
@@ -52,7 +52,7 @@ func TestTimescaleWriteDataRepository_WriteData_SucceedsOnDefinedMockSchemas(t *
 
 	for _, tenantID := range schemas {
 		data := singleDataForTenant(tenantID)
-		query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
+		query := `INSERT INTO "` + tenantSchemaName(tenantID) + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 
 		mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 			WithArgs(data[0].SensorId, data[0].GatewayId, data[0].TenantId, data[0].Profile, data[0].Timestamp, data[0].Data).
@@ -83,7 +83,7 @@ func TestTimescaleWriteDataRepository_WriteData_ReturnsErrorOnInvalidJSONBytes(t
 		},
 	}
 
-	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
+	query := `INSERT INTO "` + tenantSchemaName(tenantID) + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 	mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 		WithArgs(
 			invalidJSONData[0].SensorId,
@@ -120,7 +120,7 @@ func TestTimescaleWriteDataRepository_WriteData_IgnoresDuplicatePrimaryKey(t *te
 		},
 	}
 
-	query := `INSERT INTO "` + tenantID.String() + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
+	query := `INSERT INTO "` + tenantSchemaName(tenantID) + `".sensor_data (sensor_id, gateway_id, tenant_id, profile, timestamp, data) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (sensor_id, gateway_id, timestamp) DO NOTHING`
 	mockPg.Mock.ExpectExec(regexp.QuoteMeta(query)).
 		WithArgs(
 			duplicateRecord[0].SensorId,
@@ -171,4 +171,8 @@ func singleDataForTenant(tenantID uuid.UUID) []*datastorer.SensorData {
 			Data:      []byte(`{"v":1}`),
 		},
 	}
+}
+
+func tenantSchemaName(tenantID uuid.UUID) string {
+	return "tenant_" + tenantID.String()
 }
